@@ -1,0 +1,197 @@
+\documentclass[letterpaper,10pt,draftclsnofoot,onecolumn]{IEEEtran}
+
+\usepackage{graphicx}                                        
+\usepackage{amssymb}                                         
+\usepackage{amsmath}                                         
+\usepackage{amsthm}                                          
+
+\usepackage{alltt}                                           
+\usepackage{float}
+\usepackage{color}
+\usepackage{url}
+
+\usepackage{balance}
+\usepackage[TABBOTCAP, tight]{subfigure}
+\usepackage{enumitem}
+\usepackage{pstricks, pst-node}
+\usepackage{geometry}
+\geometry{textheight=8.5in, textwidth=6in, margin=0.75in}
+
+\usepackage{listings}
+\lstset{ %
+   language=C,                   % choose the language of the code
+   basicstyle=\small,              % the size of the fonts that are used for the code
+   keywordstyle=\color{blue},
+   stringstyle=\color{cyan},
+   commentstyle=\color{green},
+   numbers=left,                   % where to put the line-numbers
+   numberstyle=\footnotesize,      % the size of the fonts that are used for the line-numbers
+   stepnumber=1,                   % the step between two line-numbers. If it is 1 each line will be numbered
+   numbersep=5pt,                  % how far the line-numbers are from the code
+   backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+   showspaces=false,               % show spaces adding particular underscores
+   showstringspaces=false,         % underline spaces within strings
+   showtabs=false,                 % show tabs within strings adding particular underscores
+   frame=single,           		   % adds a frame around the code
+   tabsize=2,          			   % sets default tabsize to 2 spaces
+   captionpos=b,           		   % sets the caption-position to bottom
+   breaklines=true,        		   % sets automatic line breaking
+   breakatwhitespace=false,        % sets if automatic breaks should only happen at whitespace
+   escapeinside={\%*}{*)}          % if you want to add a comment within your code
+   }
+
+%random comment
+
+\newcommand{\cred}[1]{{\color{red}#1}}
+\newcommand{\cblue}[1]{{\color{blue}#1}}
+
+\usepackage{hyperref}
+\usepackage{geometry}
+\title{Writing assignment 2}
+\def\name{Arman Hastings}
+
+%pull in the necessary preamble matter for pygments output
+%\input{pygments.tex}
+
+%% The following metadata will show up in the PDF properties
+\hypersetup{
+  colorlinks = true,
+  urlcolor = black,
+  pdfauthor = {\name},
+  pdfkeywords = {cs444 ``operating systems'' I/O},
+  pdftitle = {CS 444 writing 1: I/O},
+  pdfsubject = {CS 444 writing 2},
+  pdfpagemode = UseNone
+}
+
+\begin{document}
+
+\begin{titlepage}
+   \centering
+	{\scshape\Large Writing Assignment 2\par}
+	\vspace{1.5cm}
+	{\huge\bfseries CS 444 Spring 2017\par}
+	\vspace{2cm}
+	{\Large\itshape \name \par}
+    
+    \date{\today}
+    
+    \vspace{2cm}
+    
+    
+    
+    % No Abstract needed - unless you want to add to it
+    
+    
+\end{titlepage}
+
+%intro
+The I/O manager is the heart of the operating system, by connecting  applications and system components to virtual, logical, and physical devices. The I/o manager also defines the infrastructure that supports device drivers.
+%\cite{msdn1} 
+
+The differences in Windows and FreeBSD in comparison to Linux can be directly seen through their Input/Output. To do that we simply need to observe how each operating differs with Input/Output functionality. Since the input and output from characters, data structures, algorithms, and cryptography are so critical to the functionality of operating systems, they will be the most closely examined. These functionalities are directly dependent on how the operating system manages data. Data stored in files that can typically be created, transferred, and stored on block or character devices. Block devices are simply randomly accessible fixed size chunks of data that can be accessed in any order, an example is a hard drive. Character devices are in-order accessed individual bytes of data, also known as a data streams, an example is a keyboard.
+
+These inherit differences between Windows, FreeBSD, and Linux all stem from how the developers handle the three main categories of I/O devices. The operating system for any machine is the bridge between human readable, machine readable, and communications of data. 
+I First we will observe how Windows compare to Linux.  
+\cite{}%ldd3
+
+
+% - Windows -  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+As you can image Windows and Linux tend to differ quite a bit when in comes to I/O functionality. The differences can clearly be seen in their management systems, device requests, and data structures. 
+
+In windows the I/O manager is responsible for all input and output for the operating system. This provides a uniform interface that all types of drivers can call. To do this the I/O manager has to work very closely with the cache manager, file system drivers, network drivers, and hardware device drivers. 
+What also is unique about the Windows I/O manager is that is has an asynchronous and synchronous input and output operation modes. Synchronous transmissions are synchronized by an external clock, while asynchronous transmissions are synchronized by special signals along the transmission medium. This allows Windows to run in an asynchronous mode to optimize an applications performance.
+
+The Window I/O manager does this all with I/O Request Packets, or IRP's for short. This IRP passes a pointer to an operation. Once the IRP has reached it's destination (a driver for example)  the driver preforms the operation the IRP is pointing to. The driver will then pass the IRP back to the I/O manager or on to another driver.
+
+These IRP's because they can be created, disposed and offer consistent code input for device drivers. This part of why Windows has less driver compatibility issues than Linux when having a driver preform and action. 
+\cite{Russinovich}
+
+the direct implementation of IRP's in Windows can be seen with the following command and the number "7" after the driver location. For this example we will be viewing the 28 IRP types associated with the "KBDClass".
+
+Below is the command to show the driver dispatched routines at the drivers file location: 
+\begin{lstlisting}
+lkd> !drvobj\Driver\kbdclass7
+\end{lstlisting}
+
+
+
+Below is the result of that command: 
+
+\begin{lstlisting}
+lkd> !drvobj\Driver\kbdclass7
+Driverobject(fffffa800adc2e70)isfor:
+\Driver\kbdclass
+DriverExtensionList:(id,addr)
+DeviceObjectlist:
+fffffa800b04fce0fffffa800abde560
+DriverEntry:fffff880071c8ecckbdclass!GsDriverEntry
+DriverStartIo:00000000
+DriverUnload:00000000
+AddDevice:fffff880071c53b4kbdclass!KeyboardAddDevice
+Dispatchroutines:
+[00]IRP_MJ_CREATEfffff880071bedd4kbdclass!KeyboardClassCreate
+[01]IRP_MJ_CREATE_NAMED_PIPEfffff800036abc0cnt!IopInvalidDeviceRequest
+[02]IRP_MJ_CLOSEfffff880071bf17ckbdclass!KeyboardClassClose
+[03]IRP_MJ_READfffff880071bf804kbdclass!KeyboardClassRead
+...
+[19]IRP_MJ_QUERY_QUOTAfffff800036abc0cnt!IopInvalidDeviceRequest
+[1a]IRP_MJ_SET_QUOTAfffff800036abc0cnt!IopInvalidDeviceRequest
+[1b]IRP_MJ_PNPfffff880071c0368kbdclass!KeyboardPnP
+\end{lstlisting}
+\cite{Russinovich}
+
+
+Windows also handles file descriptors differently in comparison to Linux and FreeBSD. 
+File descriptors in Windows are handled by a Windows I/O manager. Whereas in Linux and FreeBSD these file descriptors are handled by redirection. File FreeBSD and Linux descriptors are redirected through pipes and sockets
+
+
+For cryptography there are several different encryption methods available to the operating system. Methods such as AES, DES, and Blowfish are popularly used to encrypt and decrypt information. These encryption API's usually are key centric. Implementation across Windows, FreeBSD and Linux are fairly identical. The main encryption implementation differences between windows and Linux are within the underlying data structure being used within the operating system. 
+
+%\cite{msdn1}
+
+ \cite{love2010}
+
+
+
+
+
+% - FreeBSD - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+FreeBSD on the other hand is still different from Linux, however is more similar than Windows. To start file descriptors both are a part of FreeBSD and Linux file systems. These file descriptors in Windows is handled by a Windows I/O manager. Where in Linux and FreeBSD these file descriptors are handled by redirection. File descriptors are redirected through pipes and sockets. A pipe is a linear array of bytes, as is a file, but it is used solely as an I/O stream, and it is unidirectional. A socket is a transient object that is used for interprocess communication, but only exists as long as some process holds a descriptor referring to it.
+\cite{BSD1}
+These file descriptions are also accessible via the same functions available to non-operating system applications. 
+
+The basic model of a Unix I/O system is a sequence of bytes that can be accessed randomly or sequentially. The kernel does not impose structure on I/O. That means that one single I/O stream can be fed as input to any program. This unrestricted stream of data bytes, or I/O stream, functions the same between FreeBSD Linux.
+\cite{BSD1}
+Again the same encryption methods available for FreeBSD are also available for Windows, and Linux. Encryption API's usually are key centric and methods such as AES, DES, and Blowfish are popularly used to encrypt and decrypt information. There are also little to no difference between the implementation of these encryption API's in FreeBSD and Linux.
+
+
+The Linux kernel associates a special file with each I/O device driver. 
+The Linux I/O scheduler is the elevator scheduler. This scheduler maintains a single queue for disk read and
+write requests. That list of requests is then sorted by block number. The drive then moves in a single direction to satisfy each I/O request. 
+
+% - Linux - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+
+The Linux kernel associates a special file with each I/O device driver. 
+The Linux I/O scheduler is the elevator scheduler. This scheduler maintains a single queue for disk read and
+write requests. That list of requests is then sorted by block number. The drive then moves in a single direction to satisfy each I/O request. 
+
+
+
+
+
+
+
+%\cite{QEMUDOC1}
+
+\bibliography{bib}
+\bibliographystyle{ieeetr}
+
+%\input{__mt19937ar.c.tex}
+
+\end{document}
+
